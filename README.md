@@ -1,1 +1,2 @@
 # Transit-Turkey
+This application has been created because public transportation systems in Turkish cities work independently and force people to use different applications. Within the application, there are the most crowded cities in Turkey such as Ankara, Istanbul and Izmir. The app is restricted because not all local governments in Turkey share the public transport database of cities. Some cities have a low accuracy rate because their databases are outdated. This application was done to show that the solution to the above problem is possible.
