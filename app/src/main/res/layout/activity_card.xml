@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    tools:context=".CardActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BaşkentKart İşlemleri"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="40dp" />
+
+    <Button
+        android:id="@+id/buttonCheckBalance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bakiye Sorgula ve Yükle"
+        android:layout_marginBottom="20dp"
+        android:padding="15dp"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/buttonTopUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Abonman ve Kart Kişiselleştirme"
+        android:padding="15dp"
+        android:textSize="18sp"
+        android:backgroundTint="#FF6F00" />
+
+</LinearLayout>

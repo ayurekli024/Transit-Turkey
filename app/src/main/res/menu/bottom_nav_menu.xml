@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_ankara"
+        android:icon="@drawable/ic_ankara"
+        android:title="Ankara" />
+    <item
+        android:id="@+id/nav_istanbul"
+        android:icon="@drawable/ic_istanbul"
+        android:title="İstanbul" />
+    <item
+        android:id="@+id/nav_izmir"
+        android:icon="@drawable/ic_istanbul"
+        android:title="İzmir" />
+    <item
+        android:id="@+id/nav_favorites"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="Favoriler" />
+</menu>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="75dp"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/textViewDepartureTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="07:30:00" />
+
+    <TextView
+        android:id="@+id/textViewHeadsign"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:textSize="16sp"
+        android:textAlignment="textEnd"
+        android:text="KIZILAY-AKM-KEÇİÖREN" />
+
+</LinearLayout>
