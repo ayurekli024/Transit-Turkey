@@ -197,7 +197,6 @@ public class RouteStopsActivity extends AppCompatActivity implements OnStopClick
         }
     }
 
-    // KRİTİK: Eksik olan metod eklendi
     @Override
     public void onStopLongClick(Stop stop) {
         boolean isFav = dbHelper.isFavorite(stop.getStopId());
@@ -205,7 +204,8 @@ public class RouteStopsActivity extends AppCompatActivity implements OnStopClick
         String[] options = {favText, "İptal"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(stop.getStopName());
+        // Durak adının yanına ID bilgisini ekledik
+        builder.setTitle(stop.getStopName() + " (" + stop.getStopId() + ")");
         builder.setItems(options, (dialog, which) -> {
             if (which == 0) {
                 if (isFav) {

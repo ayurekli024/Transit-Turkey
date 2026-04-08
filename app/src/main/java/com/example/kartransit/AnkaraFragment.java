@@ -1,10 +1,16 @@
 package com.example.kartransit;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -29,6 +35,7 @@ public class AnkaraFragment extends Fragment {
     private Button searchButton;
     private Button cardButton;
     private Button mapButton;
+    private Button nearbyButton;
 
     @Nullable
     @Override
@@ -39,8 +46,11 @@ public class AnkaraFragment extends Fragment {
         searchButton = view.findViewById(R.id.button_search);
         cardButton = view.findViewById(R.id.buttonCardOperations);
         mapButton = view.findViewById(R.id.buttonMetroMap);
+        nearbyButton = view.findViewById(R.id.buttonNearbyStops);
 
         searchButton.setOnClickListener(v -> performStopSearch());
+        nearbyButton.setOnClickListener(v -> checkLocationAndFindNearbyStops());
+        
         cardButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), CardActivity.class);
             startActivity(intent);
@@ -54,6 +64,43 @@ public class AnkaraFragment extends Fragment {
         addPlacesList(view);
 
         return view;
+    }
+
+    private void checkLocationAndFindNearbyStops() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
+            return;
+        }
+
+        LocationManager locationManager = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
+        Location lastKnown = null;
+        
+        try {
+            lastKnown = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (lastKnown == null) {
+                lastKnown = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+
+        if (lastKnown != null) {
+            Intent intent = new Intent(getActivity(), SearchResultsActivity.class);
+            intent.putExtra("IS_NEARBY", true);
+            intent.putExtra("USER_LAT", lastKnown.getLatitude());
+            intent.putExtra("USER_LON", lastKnown.getLongitude());
+            intent.putExtra("CITY_NAME", "ankara");
+            startActivity(intent);
+        } else {
+            Toast.makeText(getContext(), "Konum alınamadı. Lütfen GPS'i açın.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1001 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            checkLocationAndFindNearbyStops();
+        }
     }
 
     private void addPlacesList(View view) {
@@ -74,13 +121,13 @@ public class AnkaraFragment extends Fragment {
         ));
         placesData.put("AVMLER", Arrays.asList(
                 "ANKAMALL", "ATG-YHT", "FORUM ANKARA", "ANTARES AVM", "TAURUS AVM", "VEGA-SUBAYEVLERİ",
-                "NATA VEGA", "ARMADA", "CEPA", "KENTPARK", "FTZ", "KIZILAY AVM", "ACİTY", "OPTIMUM",
+                "NATA VEGA", "ARMADA", "CEPA AVM", "KENTPARK", "FTZ", "KIZILAY AVM", "ACİTY", "OPTIMUM",
                 "PANORA AVM"
         ));
         placesData.put("ÜNİVERSİTELER", Arrays.asList(
                 "ODTÜ(ORTA DOĞU TEKNİK ÜNİVERSİTESİ)", "BİLKENT ÜNİVERSİTESİ", "HACETTEPE SIHHİYE YERLEŞKESİ","HACETTEPE BEYTEPE YERLEŞKESİ", "ANKARA ÜNİVERSİTESİ DİL, TARİH VE COĞRAFYA FAKÜLTESİ","ANKARA ÜNVERSİTESİ BEŞEVLER YERLEŞKESİ", "ANKARA ÜNİVERSİTESİ KEÇİÖREN YERLEŞKESİ",
-                "YILDIRIM BEYAZIT ÜNİVERSİTESİ","ANKARA ÜNİVERSİTESİ GÖLBAŞI YERLEŞKESİ","ANKARA ÜNİVERSİTESİ CEBECİ YERLEŞLESİ", "ANKARA ÜNİVERSİTESİ TIP FAKÜLTESİ",
-                "ANKARA MEDİPOL ÜNİVERSİTESİ","BAŞKENT ÜNİVERSİTESİ","ÇANKAYA ÜNİVERSİTESİ","GAZİ ÜNİVERSİTESİ","HACI BAYRAM VELİ ÜNİVERSİTESİ","UFUK ÜNİVERSİTESİ"
+                "YILDIRIM BEYAZIT ÜNİVERSİTESİ ETLİK YERLEŞKESİ","AYBÜ ÇUBUK YERLEŞLESİ","ANKARA ÜNİVERSİTESİ GÖLBAŞI YERLEŞKESİ","ANKARA ÜNİVERSİTESİ CEBECİ YERLEŞLESİ", "ANKARA ÜNİVERSİTESİ TIP FAKÜLTESİ",
+                "ANKARA MEDİPOL ÜNİVERSİTESİ","BAŞKENT ÜNİVERSİTESİ","ÇANKAYA ÜNİVERSİTESİ","GAZİ ÜNİVERSİTESİ","HACI BAYRAM VELİ ÜNİVERSİTESİ","UFUK ÜNİVERSİTESİ","ANKARA BİLİM ÜNİVERSİTESİ","TOBB ÜNİVERSİTESİ"
         ));
         placesData.put("KÜLTÜREL YERLER", Arrays.asList(
                 "MİLLİ KÜTÜPHANE", "CSO ADA ANKARA", "DEVLET TİYATROLARI ŞİNASİ SAHNESİ", "MEB ŞURA SALONU", "MİLLET KÜTÜPHANESİ", "CERMODERN",
@@ -177,6 +224,19 @@ public class AnkaraFragment extends Fragment {
                         "Kızılay Meydanından yürüyerek 25 dk da ulaşabilirsiniz.";
             case "MİLLİ KÜTÜPHANE":
                 return "M2 Metrosunun Milli Kütüphane İstasyonu'nda inip ulaşabilirsiniz.";
+            case "ATO CONGRESSIUM":
+                return "M2 Metrosunun Söğütözü İstasyonu'nda inip ulaşabilirsiniz.";
+            case "BAHÇELİEVLER":
+                return "M2 Metrosunun Milli Kütüphane İstasyonu'nda inip ulaşabilirsiniz." +
+                        "Ankaray hattının Beşevler istasyonundan erişebilirsiniz.";
+            case "KENTPARK":
+                return "M2 Metrosunun ODTÜ veya Bilkent İstasyonu'nda inip 10 dakika yürüme mesafesinde ulaşabilirsiniz." +
+                        "112 ve 339-5 hatları tam önünde durmaktadır.";
+            case "CEPA AVM":
+                return "M2 Metrosunun ODTÜ veya Bilkent İstasyonu'nda inip 10 dakika yürüme mesafesinde ulaşabilirsiniz." +
+                        "112 ve 339-5 hatları tam önünde durmaktadır.";
+            case "ANITKABİR":
+                return "Ankaray hatının ANADOLU/ANITKABİR İstasyonu'nda inip ulaşabilirsiniz.";
             case "ANKARA YHT GARI":
                 return "M4 Keçiören Metrosunun GAR istasyonundan erişebilirsiniz.\n" +
                         "Sıhhiye Köprüsünün üstündeki çoğu otobüs önünden geçer.\n" +

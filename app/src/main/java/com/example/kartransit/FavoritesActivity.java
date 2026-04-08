@@ -40,7 +40,6 @@ public class FavoritesActivity extends AppCompatActivity implements OnStopClickL
             DatabaseHelper db = new DatabaseHelper(this, city);
             List<Stop> cityFavs = db.getAllFavorites();
             if (cityFavs != null) {
-                // Her durağın hangi şehre ait olduğunu bildiğimizden emin olalım
                 for (Stop s : cityFavs) {
                     if (s.getCityName() == null) s.setCityName(city);
                 }
@@ -61,7 +60,6 @@ public class FavoritesActivity extends AppCompatActivity implements OnStopClickL
         Intent intent = new Intent(this, RouteDetailsActivity.class);
         intent.putExtra("STOP_ID", stop.getStopId());
         intent.putExtra("STOP_NAME", stop.getStopName());
-        // Durak nesnesinde kayıtlı olan şehri kullan
         String city = stop.getCityName();
         if (city == null) city = "ankara"; 
         intent.putExtra("CITY_NAME", city);
@@ -70,8 +68,9 @@ public class FavoritesActivity extends AppCompatActivity implements OnStopClickL
 
     @Override
     public void onStopLongClick(Stop stop) {
+        // Durak ID'si başlığa eklendi
         new AlertDialog.Builder(this)
-                .setTitle(stop.getStopName())
+                .setTitle(stop.getStopName() + " (" + stop.getStopId() + ")")
                 .setMessage("Bu durağı favorilerden kaldırmak istiyor musunuz?")
                 .setPositiveButton("Kaldır", (dialog, which) -> {
                     String city = stop.getCityName();

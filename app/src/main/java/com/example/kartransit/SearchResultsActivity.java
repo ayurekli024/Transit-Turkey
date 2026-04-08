@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResultsActivity extends AppCompatActivity implements OnStopClickListener {
@@ -19,6 +20,8 @@ public class SearchResultsActivity extends AppCompatActivity implements OnStopCl
     private DatabaseHelper dbHelper;
     private String searchQuery;
     private String cityName;
+    private boolean isNearbySearch = false;
+    private double userLat, userLon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +31,11 @@ public class SearchResultsActivity extends AppCompatActivity implements OnStopCl
         cityName = getIntent().getStringExtra("CITY_NAME");
         if (cityName == null) cityName = "ankara";
 
+        isNearbySearch = getIntent().getBooleanExtra("IS_NEARBY", false);
+
         if (getSupportActionBar() != null) {
-            String cityTitle = cityName.substring(0, 1).toUpperCase() + cityName.substring(1);
-            getSupportActionBar().setTitle("Arama Sonuçları (" + cityTitle + ")");
+            String title = isNearbySearch ? "Yakındaki Duraklar" : "Arama Sonuçları";
+            getSupportActionBar().setTitle(title);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -40,10 +45,32 @@ public class SearchResultsActivity extends AppCompatActivity implements OnStopCl
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbHelper = new DatabaseHelper(this, cityName);
 
-        searchQuery = getIntent().getStringExtra("SEARCH_QUERY");
-        if (searchQuery != null) {
-            startSearch(searchQuery);
+        if (isNearbySearch) {
+            userLat = getIntent().getDoubleExtra("USER_LAT", 0);
+            userLon = getIntent().getDoubleExtra("USER_LON", 0);
+            startNearbySearch();
+        } else {
+            searchQuery = getIntent().getStringExtra("SEARCH_QUERY");
+            if (searchQuery != null) {
+                startSearch(searchQuery);
+            }
         }
+    }
+
+    private void startNearbySearch() {
+        progressBar.setVisibility(View.VISIBLE);
+        new Thread(() -> {
+            final List<Stop> results = dbHelper.getNearbyStops(userLat, userLon, 250.0);
+            runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                if (results != null && !results.isEmpty()) {
+                    StopAdapter adapter = new StopAdapter(results, null, null, this);
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    Toast.makeText(this, "250m içinde durak bulunamadı.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 
     private void startSearch(String query) {
@@ -81,7 +108,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnStopCl
         String[] options = {favText, "İptal"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(stop.getStopName());
+        builder.setTitle(stop.getStopName() + " (" + stop.getStopId() + ")");
         builder.setItems(options, (dialog, which) -> {
             if (which == 0) {
                 if (isFav) {

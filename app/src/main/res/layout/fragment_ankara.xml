@@ -55,6 +55,14 @@
                 android:layout_marginTop="8dp" />
 
             <Button
+                android:id="@+id/buttonNearbyStops"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="YAKINDAKİ DURAKLAR (250m)"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#FF9800" />
+
+            <Button
                 android:id="@+id/buttonCardOperations"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +91,6 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="2" />
-
 
             <LinearLayout
                 android:id="@+id/places_container"

@@ -95,7 +95,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e("DB_UPGRADE", "Veritabanı kopyalanamadı", e);
             }
         }
-        db.execSQL("ALTER TABLE favorites ADD COLUMN city_name TEXT");
+        // favorites tablosu kontrolü
+        db.execSQL("CREATE TABLE IF NOT EXISTS favorites (stop_id TEXT PRIMARY KEY, stop_name TEXT, stop_lat REAL, stop_lon REAL, city_name TEXT)");
     }
 
     @Override
@@ -111,7 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("stop_name", stop.getStopName());
         values.put("stop_lat", stop.getStopLat());
         values.put("stop_lon", stop.getStopLon());
-        values.put("city_name", this.city); // O anki aktif şehri kaydet
+        values.put("city_name", this.city);
         db.insertWithOnConflict("favorites", null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
@@ -141,6 +142,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return list;
+    }
+
+    public List<Stop> getNearbyStops(double userLat, double userLon, double radiusInMeters) {
+        List<Stop> stopList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        
+        // Yaklaşık derece hesabı (250m için ~0.00225 derece)
+        double latDelta = radiusInMeters / 111320.0;
+        double lonDelta = radiusInMeters / (111320.0 * Math.cos(Math.toRadians(userLat)));
+
+        String sql = "SELECT stop_id, stop_name, stop_lat, stop_lon FROM stops " +
+                "WHERE stop_lat BETWEEN ? AND ? AND stop_lon BETWEEN ? AND ? LIMIT 100";
+        
+        String[] args = {
+                String.valueOf(userLat - latDelta),
+                String.valueOf(userLat + latDelta),
+                String.valueOf(userLon - lonDelta),
+                String.valueOf(userLon + lonDelta)
+        };
+
+        try (Cursor cursor = db.rawQuery(sql, args)) {
+            if (cursor.moveToFirst()) {
+                do {
+                    stopList.add(new Stop(cursor.getString(0), cursor.getString(1), 
+                             cursor.getDouble(2), cursor.getDouble(3), this.city));
+                } while (cursor.moveToNext());
+            }
+        }
+        return stopList;
     }
 
     public List<Stop> searchStops(String query) {
