@@ -5,3 +5,4 @@ A few key features:
 - Bus Stops can be added to favorites.
 - Rail system map belonging to cities can be displayed.
 - The balance information of the public transport card, which is specific to the city, can be accessed. 
+Additionally, this application includes a Wear OS app.
